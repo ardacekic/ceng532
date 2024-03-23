@@ -1,2 +1,2 @@
-.. |fredericksons_algo| replace:: Distributed Algorithm Name 
+.. |fredericksons_algo| replace:: Frederickson's Algorithm 
 
