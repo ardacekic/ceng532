@@ -1,6 +1,6 @@
 .. include:: substitutions.rst
 
-|fredericksons_algo|
+|touegs_algo|
 =========================================
 
 
@@ -10,7 +10,7 @@ Background and Related Work
 
 Present any background information survey the related work. Provide citations.
 
-Distributed Algorithm: |fredericksons_algo| 
+Distributed Algorithm: |touegs_algo| 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An example distributed algorithm for broadcasting on an undirected graph is presented in  :ref:`Algorithm <BlindFloodingAlgorithmLabel>`.

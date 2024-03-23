@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Distributed Algorithm on AHCv2: fredericksons_algo'
+project = 'Distributed Algorithm on AHCv2: touegs_algo'
 copyright = '2024, Arda Çekiç'
 author = 'Arda Çekiç'
 release = 'V1.0.0'

@@ -1,7 +1,7 @@
 .. include:: substitutions.rst
 
 ================================
-|fredericksons_algo|
+|touegs_algo|
 ================================
 
 
