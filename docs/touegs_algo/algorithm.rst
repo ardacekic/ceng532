@@ -94,6 +94,18 @@ Toueg's algorithm is:
 • However, although each node knows its parent in Tw, the parent does not know its children.
 • Each node tells it neighbour every iteration whether it is a neighbour or not.
 
+**How improved algorithm works:**
+
+1. The main loop is executed (|V |) times. It contains a loop with (|V |) iterations (and a few with O(|V |) iterations) and loop contents that take O(1) time. The total running time is O(|V |^2).
+2. The improved algorithm removes the need for broadcasting.
+3. Assume that a pair consisting of an edge/path weight and a node name can be sent in W bits.
+4. Then, the child and nochild messages are W bits.
+5. The Dw messages are |V |W bits.
+6. 2 child/nochild messages per edge and iteration and one table transfer per vertex at the most per iteration.
+7. O(|V|^3W)bitstotal.
+
+We will implement and collect results form simple algorithm in this paper. 
+
 Complexity 
 ~~~~~~~~~~
 
