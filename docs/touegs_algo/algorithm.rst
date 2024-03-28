@@ -104,7 +104,7 @@ Toueg's algorithm is:
 6. 2 child/nochild messages per edge and iteration and one table transfer per vertex at the most per iteration.
 7. O(|V|^3W)bitstotal.
 
-We will implement and collect results form simple algorithm in this paper. 
+We will implement and collect results form simple algorithm in this document. 
 
 Complexity 
 ~~~~~~~~~~
