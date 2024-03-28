@@ -5,7 +5,7 @@
 
 Background and Related Work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In 1985, Greg N. Frederickson outlined a Breadth-First Search Tree Algorithm in his paper A Single Source Shortest Path Algorithm for a Planar Distributed Network, which served as a foundational component for creating an all-pairs shortest-path algorithm. However, the explanation of this BFS algorithm lacked comprehensive detail and operated under the assumption that messages within the algorithm were processed in a first-in-first-out (FIFO) manner.
+In 1985, Greg N. Frederickson outlined a Breadth-First Search Tree Algorithm in his paper A Single Source Shortest Path Algorithm for a Planar Distributed Network, which served as a foundational component for creating an single-source shortest-path algorithm. However, the explanation of this BFS algorithm lacked comprehensive detail and operated under the assumption that messages within the algorithm were processed in a first-in-first-out (FIFO) manner.
 
 In 2000, Tel reviewed and made modifications to Frederickson’s BFS algorithm. Despite this, Tel's notation of the algorithm remained incomplete and still relied on the assumption of a FIFO environment.
 
@@ -17,9 +17,7 @@ Consider a scenario where data needs to traverse through various nodes within a 
 
 In order to route data through paths with the lowest costs, algorithms such as all-pairs shortest-path algorithms come into play. On the other hand, when the objective is to route data utilizing the minimum number of nodes, a breadth-first search (BFS) algorithm becomes instrumental.
 
-Frederickson [1985] introduced a distributed BFS algorithm, which he leveraged for developing an all-pairs shortest-path algorithm. However, this BFS algorithm functions as a foundational element, and its explanation lacks comprehensive detail. The provided description presupposes that messages within the algorithm are processed in a first-in-first-out (FIFO) manner.
-
-Frederickson's Distributed BFS Algorithm, also known as the Distributed Breadth-First Search Algorithm, is a parallel algorithm for traversing a graph. It was developed by Greg N. Frederickson in 1985.
+Frederickson [1985] introduced a distributed BFS algorithm, which he leveraged for developing an all-pairs shortest-path algorithm. Frederickson's Distributed BFS Algorithm, also known as the Distributed Breadth-First Search Algorithm, is a parallel algorithm for traversing a graph. It was developed by Greg N. Frederickson in 1985.
 The algorithm is designed to run on a distributed system, where each node in the graph is represented by a separate processor. The algorithm is based on the concept of breadth-first search, where the nodes are visited in a level-by-level manner.
 
 1. **The algorithm has the following properties:** 
@@ -158,15 +156,11 @@ Correctness
 
 The **correctness** of the BFS algorithm is established by ensuring the resulting tree accurately represents a BFS tree of the network graph upon the algorithm's termination.
 
-**Proof Outline:**
-
 - The algorithm builds the tree incrementally, starting from the root (initiator), ensuring each node is placed correctly according to BFS order.
 - By induction, if nodes up to level `n` are correctly placed, a node at level `n+1` receives an "explore" message from level `n`, preserving the BFS order.
 - Completeness is ensured as each node waits for replies from all neighbors before proceeding, thereby incorporating every reachable node in the network into the BFS tree.
 
 **Safety** properties guarantee the algorithm's execution avoids incorrect states, such as cycles or nodes with multiple parents.
-
-**Proof Outline:**
 
 - Upon receiving its first "explore" message, a node sets its parent, preventing multiple parents or cycle creation.
 - The propagation of forward and reverse messages through the tree structure prevents inconsistencies and ensures a cycle-free tree.
