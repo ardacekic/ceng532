@@ -6,9 +6,9 @@
 Distributed Algorithm: |touegs_algo| 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The peseudo code of the Toueg's simple variant and full variant will be on this section. 
+The pseudo code of the Toueg's simple variant and full variant will be on this section. 
 
-Toueg's algorithm is:
+Toueg's algorithm is ::
 
 1. An distributed algorithm
 2. Based on Floyd-Warshall
@@ -41,7 +41,8 @@ Toueg's algorithm is:
        end
     end
 
-• About simple algorithm:
+About simple algorithm ::
+   
 • Floyd-Warshall algorithm with variables split over nodes of the network.
 • Every node has information on the shortest route (found so far) to every other node.
 • In every step every node requires distance information from the pivot node, so the pivot node broadcasts the information over the entire net.
@@ -88,7 +89,8 @@ Toueg's algorithm is:
     end
     end    
 
-• About updated variant:
+About updated variant ::
+
 • If Du[w] = inf in the main loop, the test is always false. Thus, a node u for which Du[w] = inf need not receive data from pivot w.
 • In other words, w only needs to send routing data to nodes that have a next hop node and are therefore part of its sink tree Tw.
 • However, although each node knows its parent in Tw, the parent does not know its children.
