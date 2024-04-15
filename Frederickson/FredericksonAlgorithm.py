@@ -4,21 +4,60 @@ from adhoccomputing.Generics import *
 import numpy as np
 from threading import Lock
 import queue
-import adhoccomputing.GenericModel as GenericModel1
-class GenericMessageHeader:
 
-  def __init__(self, messagetype, messagefrom, messageto, nexthop=float('inf'), interfaceid=float('inf'), sequencenumber=-1):
-    self.messagetype = messagetype
-    self.messagefrom = messagefrom
-    self.messageto = messageto
-    self.nexthop = nexthop
-    self.interfaceid = interfaceid
-    self.sequencenumber = sequencenumber
-  def __str__(self) -> str:
-    return f"GenericMessageHeader: TYPE: {self.messagetype} FROM: {self.messagefrom} TO: {self.messageto} NEXTHOP: {self.nexthop} INTERFACEID: {self.interfaceid} SEQUENCE#: {self.sequencenumber}"
+class GenericMessageHeader:
+    """
+    This class represents a generic message header for network messages.
+    It encapsulates common header information used in messaging systems or network protocols.
+    """
+
+    def __init__(self, messagetype, messagefrom, messageto, nexthop=float('inf'), interfaceid=float('inf'), sequencenumber=-1):
+        """
+        Initializes a new instance of the GenericMessageHeader class.
+        
+        Parameters:
+            messagetype (str): Specifies the type of the message.
+            messagefrom (str): Identifier of the sender of the message.
+            messageto (str): Identifier of the intended recipient of the message.
+            nexthop (float): Designates the next system or interface to which the message should be sent (default is infinite).
+            interfaceid (float): Specifies the network interface identifier (default is infinite).
+            sequencenumber (int): An optional sequence number to keep track of message order (default is -1).
+        """
+        self.messagetype = messagetype
+        self.messagefrom = messagefrom
+        self.messageto = messageto
+        self.nexthop = nexthop
+        self.interfaceid = interfaceid
+        self.sequencenumber = sequencenumber
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the message header, providing a human-readable form of its content.
+
+        Returns:
+            str: A formatted string detailing the message's type, source, destination, next hop, interface ID, and sequence number.
+        """
+        return f"GenericMessageHeader: TYPE: {self.messagetype} FROM: {self.messagefrom} TO: {self.messageto} NEXTHOP: {self.nexthop} INTERFACEID: {self.interfaceid} SEQUENCE#: {self.sequencenumber}"
 
 class ComponentModel:
-    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=5, topology=None, child_conn=None, node_queues=None, channel_queues=None):
+    """
+    ComponentModel defines the base for a component in a networked or distributed system,
+    facilitating event-driven interactions with other components via defined connectors.
+    It manages the sending and receiving of events, and controls threading and event handling.
+    """
+    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=2, topology=None, child_conn=None, node_queues=None, channel_queues=None):
+        """
+        Initializes a new instance of ComponentModel with various configurations.
+
+        Parameters:
+            componentname (str): The name identifier for the component.
+            componentinstancenumber (int): Unique instance number for the component.
+            context (any): Optional. A context wrapper for passing additional data.
+            configurationparameters (dict): Optional. Parameters for configuring the component.
+            num_worker_threads (int): Number of worker threads for handling events. Default is 2. More than 1 message should be handled. One node can be Triggered with other nodes in Graph. Use number of nodes.
+            topology (any): Optional. The network topology associated with the component.
+            child_conn, node_queues, channel_queues: Infrastructure for inter-component communication.
+        """
         self.topology = topology
         self.child_conn = child_conn
         self.node_queues=node_queues
@@ -54,32 +93,35 @@ class ComponentModel:
 
 
     def initiate_process(self):
+        """
+        Initiates the component by triggering the INIT event and propagating it to subcomponents.
+        """
         self.trigger_event(Event(self, EventTypes.INIT, None))
         self.initeventgenerated = True
         for c in self.components:
-            #c.inputqueue.put_nowait(Event(self, EventTypes.INIT, None))
-            #c.trigger_event(Event(self, EventTypes.INIT, None))
             c.initiate_process()
-        #self.inputqueue.put_nowait(Event(self, EventTypes.INIT, None))
         
     def exit_process(self):
+        """
+        Safely exits the component by propagating the EXIT event through all subcomponents.
+        """
         for c in self.components:
-            #c.inputqueue.put_nowait(Event(self, EventTypes.EXIT, None))
             c.trigger_event(Event(self, EventTypes.EXIT, None))
-        #self.inputqueue.put_nowait(Event(self, EventTypes.EXIT, None))
         self.trigger_event(Event(self, EventTypes.EXIT, None))
         
     def send_down(self, event: Event):
+        """
+        Send the event to lower level components.
+        """
         try:
             for p in self.connectors[ConnectorTypes.DOWN]:
                 p.trigger_event(event)
         except Exception as e:
             raise(f"Cannot send message to Down Connector {self.componentname } -- {self.componentinstancenumber}")
-            #logger.error(f"Cannot send message to DOWN Connector {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
             pass
         try:
             src = int(self.componentinstancenumber)
-            event.eventsource = None # for avoiding thread.lock problem
+            event.eventsource = None 
             if self.channel_queues is not None:
                 n = len(self.channel_queues[0])
                 for i in range(n):
@@ -88,36 +130,6 @@ class ComponentModel:
                         self.channel_queues[src][dest].put(event)
         except Exception as e:
             logger.error(f"Cannot send message to DOWN Connector over queues {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
-
-
-    def send_up_from_channel(self, event: Event, loopback = False):
-        try:
-            #self.connectors[ConnectorTypes.UP].eventhandlers[EventTypes.MFRB](event)
-            if loopback: # loopback is only valid in symmetric channel constructors of the topology class
-                for p in self.connectors[ConnectorTypes.UP]:
-                        p.trigger_event(event)
-            else:
-                for p in self.connectors[ConnectorTypes.UP]:
-                    if p.componentinstancenumber != event.eventsource_componentinstancenumber: #TO AVOID LOOPBACK provide the loopback optional parameter
-                        p.trigger_event(event)
-
-        except Exception as e:
-            #logger.error(f"Cannot send message to UP Connector from channel {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
-            pass
-
-        try:
-            src = int(event.fromchannel.split("-")[0]) 
-            dest = int(event.fromchannel.split("-")[1])
-            event.eventsource = None # for avoiding thread.lock problem
-            if self.node_queues is not None:
-                if self.node_queues[src][dest] is not None:
-                    try:
-                        self.node_queues[src][dest].put(event) 
-                        pass
-                    except Exception as ex:
-                        logger.error(f"Cannot put to queue {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
-        except Exception as ex:
-            logger.error(f"Cannot send message to UP Connector from channel {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
 
     def send_up(self, event: Event):
         try:
@@ -128,22 +140,6 @@ class ComponentModel:
         except Exception as e:
             logger.error(f"Cannot send message to UP Connector {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
 
-    def send_peer(self, event: Event):
-        try:
-            for p in self.connectors[ConnectorTypes.PEER]:
-                p.trigger_event(event)
-        except Exception as e:
-            logger.error(f"Cannot send message to PEER Connector {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
-
-    def U(self, component):
-        self.connect_me_to_component(ConnectorTypes.UP, component)
-  
-    def D(self, component):
-        self.connect_me_to_component(ConnectorTypes.DOWN, component)
-  
-    def P(self, component):
-        self.connect_me_to_component(ConnectorTypes.PEER, component)
-    
     def connect_me_to_component(self, name, component):
         try:
             self.connectors[name] = component
@@ -168,8 +164,6 @@ class ComponentModel:
     def on_message_from_top(self, eventobj: Event):
         logger.debug(f"{EventTypes.MFRT} is not handled  {self.componentname}.{self.componentinstancenumber}")
         pass
-        #if self.child_conn is not None:
-        #    self.child_conn.send("Channel Deneme")
 
     def on_message_from_peer(self, eventobj: Event):
         logger.debug(f"{EventTypes.MFRP} is not handled  {self.componentname}.{self.componentinstancenumber}")
@@ -182,15 +176,15 @@ class ComponentModel:
 
     def on_init(self, eventobj: Event):
         logger.debug(f"{EventTypes.INIT} is not handled {self.componentname}.{self.componentinstancenumber} exiting")
-        
-
-         
+                 
     def queue_handler(self, myqueue):
+        """
+        Handles queued events, processing each by invoking the appropriate event handler.
+        """
         while not self.terminated:
             workitem = myqueue.get()
             if workitem.event in self.eventhandlers:
                 self.on_pre_event(workitem)
-                #logger.debug(f"{self.componentname}-{self.componentinstancenumber} will handle {workitem.event}")
                 self.eventhandlers[workitem.event](eventobj=workitem)  # call the handler
             else:
                 logger.error(f"{self.componentname}.{self.componentinstancenumber} Event Handler: {workitem.event} is not implemented")
@@ -198,25 +192,35 @@ class ComponentModel:
 
     def on_connected_to_component(self, name, channel):
         logger.debug(f"Connected channel-{name} by component-{self.componentinstancenumber}:{channel.componentinstancenumber}")
-        
         pass
 
     def trigger_event(self, eventobj: Event):
-        #logger.debug(f"{self.componentname}.{self.componentinstancenumber} invoked with {str(eventobj)}")
         self.inputqueue.put_nowait(eventobj)
 
 
     def on_pre_event(self, event):
-        #logger.debug(f"{self.componentname}.{self.componentinstancenumber} invoked with {str(event)} will run on_pre_event here")
         pass
         
     def send_self(self, event: Event):
-        #logger.debug(f"{self.componentname}.{self.componentinstancenumber} invoking itself with {str(event)}")
         self.trigger_event(event)
 
 class FredericksonAlgorithmSimpleComponent(ComponentModel):
+    """
+    A specialized component that implements Frederickson's algorithm, a distributed algorithm for solving certain
+    problems in a networked environment. This component extends ComponentModel, adding specific initializations and
+    behaviors needed for the algorithm's operations.
+    """
     def __init__(self, componentname, componentid, topology):
-        super(FredericksonAlgorithmSimpleComponent, self).__init__(componentname, componentid, topology=topology)
+        """
+        Initializes a new instance of FredericksonAlgorithmSimpleComponent with specified component name, ID, and topology.
+
+        Parameters:
+            componentname (str): The name identifier for the component.
+            componentid (int): Unique identifier for this component instance.
+            topology (any): The network topology associated with this component, necessary for algorithmic operations.
+            num_worker_threads (int): Number of worker threads for handling events. Default is 2. More than 1 message should be handled. One node can be Triggered with other nodes in Graph. Use number of nodes.
+        """
+        super(FredericksonAlgorithmSimpleComponent, self).__init__(componentname, componentid, topology=topology, num_worker_threads=topology.G.number_of_nodes())
         self.TOPO = topology
         self.queue_lock = Lock()
         self.message_queue = []
@@ -227,10 +231,25 @@ class FredericksonAlgorithmSimpleComponent(ComponentModel):
             self.is_initiator = False   
 
     def on_init(self, eventobj: Event):
+        """
+        Handles the initialization event for the component. This method overrides the on_init method in ComponentModel
+        to perform custom initialization steps specific to Frederickson's algorithm.
+
+        Parameters:
+            eventobj (Event): The event object associated with the INIT event, containing any relevant data.
+        """
         super(FredericksonAlgorithmSimpleComponent, self).on_init(eventobj)
-        self.job([45, 54, 123])
+        self.job()
 
     def on_message_from_bottom(self, eventobj: Event):
+        """
+        Handles messages received from lower-level components or subsystems.
+        Filters messages to process only those that are intended for this component,
+        and depending on the message type, processes or queues them for further handling.
+
+        Parameters:
+            eventobj (Event): The event object containing the message and its metadata.
+        """
         message_to = eventobj.eventcontent.header.messageto.split("-")[1]
         message_from = eventobj.eventcontent.header.messagefrom.split("-")[1]
         print(f"{self.componentinstancenumber} received {message_from}")
@@ -245,19 +264,13 @@ class FredericksonAlgorithmSimpleComponent(ComponentModel):
                 self.message_queue.append((int(message_source_id), message_type, content))
                 self.queue_lock.release()
 
-
-    def on_message_from_peer(self, eventobj: Event):
-        print("anything?")
-        message_header = eventobj.eventcontent.header
-        message_target = eventobj.eventcontent.header.messageto.split("-")[0]
-        if message_target == FredericksonAlgorithmSimpleComponent.__name__:
-            if self.is_initiator:
-                if message_header.messagetype == "INITIATEBFSCONSTRUCTION":
-                    self.job([45, 54, 123])
-
-    def job(self, *arg):
+    def job(self):
+        """
+        Initiates the algorithm's task, such as exploring paths or processing data,
+        based on the topology and neighbors of the component.
+        """
         self.neighbors = self.TOPO.get_neighbors(self.componentinstancenumber)  # retrieve all neighbor ids...
-        self.neighbor_weights = {a: 1 for a in self.neighbors}  # for the time being each edge weight is 1...
+        self.neighbor_weights = {a: 1 for a in self.neighbors}  
 
         def getPaths(data):
             if len(data) == 0:
@@ -278,6 +291,15 @@ class FredericksonAlgorithmSimpleComponent(ComponentModel):
         paths = getPaths(tree)
 
     def FredericksonAlgorithmSimple(self):
+        """
+        Where the algorithm goes.
+        Nodes may face with these messages:
+        1. Node u receives ⟨forward,f⟩ from node v.
+        2. Node u receives ⟨explore, f, m⟩ from node v. 
+        3. Node u receives ⟨reverse, b⟩ from node v.
+        See the algorithm detail:
+        A Scrutiny of Frederickson’s Distributed Breadth-First Search Algorithm - Victor van der Veen
+        """
         print(f"{self.componentinstancenumber} started FredericksonAlgorithm Thread")
         self.positively_responded_nodes = []
         self.level_u = np.inf
