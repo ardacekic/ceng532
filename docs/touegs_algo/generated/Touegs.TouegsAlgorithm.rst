@@ -1,7 +1,7 @@
-﻿Snapshot.LaiYangSnapshot
-========================
+﻿Touegs.TouegsAlgorithm
+======================
 
-.. automodule:: Snapshot.LaiYangSnapshot
+.. automodule:: Touegs.TouegsAlgorithm
 
    
    
@@ -17,10 +17,10 @@
 
    .. autosummary::
    
-   .. autoclass:: LaiYangComponentModel
+   .. autoclass:: ComponentModel
       :members:
       :undoc-members:
-   .. autoclass:: LaiYangState
+   .. autoclass:: TouegRoutingComponent
       :members:
       :undoc-members:
    
