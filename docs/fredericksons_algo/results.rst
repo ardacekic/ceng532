@@ -46,8 +46,3 @@ Discussion
 ~~~~~~~~~~
 
 Present and discuss main learning points.
-
-
-
-
-.. [Shuttleworth2016] M. Shuttleworth. (2016) Writing methodology. `Online <https://explorable.com/writing-methodology>`_.
