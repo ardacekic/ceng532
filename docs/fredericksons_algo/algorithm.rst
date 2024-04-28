@@ -9,7 +9,9 @@ In 1985, Greg N. Frederickson outlined a Breadth-First Search Tree Algorithm in 
 
 In 2000, Tel reviewed and made modifications to Frederickson’s BFS algorithm. Despite this, Tel's notation of the algorithm remained incomplete and still relied on the assumption of a FIFO environment.
 
-In 2006, Tel outlined a fix to address the shortcomings, but once again, the FIFO assumption persisted. Van Moolenbroek suggested an alternative fix in the same year, but no further research was conducted on the subject.
+In 2006, Tel outlined a fix to address the shortcomings, but once again, the FIFO assumption persisted. Van Moolenbroek suggested an alternative fix in the same year, but no further research was conducted on the subject. 
+
+The way the Frederickson's how to build the algorithm will be disscuessed in this paper and it will be implemented. The Tel's algorithm update is similar to advanced algorithm the Frederickson proposed.
 
 Distributed Algorithm:  Frederickson's Algorithm 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
