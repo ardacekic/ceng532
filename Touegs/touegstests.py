@@ -56,6 +56,7 @@ class testfrederickson:
     G.add_node(0)
     G.add_node(1)
     G.add_node(2)
+
     G.add_edge(0, 1)
     G.add_edge(1, 2)
 

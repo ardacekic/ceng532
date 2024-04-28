@@ -1,4 +1,4 @@
-from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
+from adhoccomputing.GenericModel import GenericModel, GenericMessagePayload
 from adhoccomputing.Experimentation.Topology import Topology
 import time
 import queue
@@ -8,6 +8,30 @@ from timeit import default_timer as timer
 from adhoccomputing.Generics import *
 from threading import Lock
 
+class GenericMessagePayload:
+
+  def __init__(self, messagepayload):
+    self.messagepayload = messagepayload
+
+class GenericMessage:
+
+  def __init__(self, header, payload):
+    self.header = header
+    self.payload = payload
+    self.uniqueid = str(header.messagefrom) + "-" + str(header.sequencenumber)
+  def __str__(self) -> str:
+    return f"GENERIC MESSAGE: HEADER: {str(self.header)} PAYLOAD: {str(self.payload)}"
+class GenericMessageHeader:
+
+  def __init__(self, messagetype, messagefrom, messageto, nexthop=float('inf'), interfaceid=float('inf'), sequencenumber=-1):
+    self.messagetype = messagetype
+    self.messagefrom = messagefrom
+    self.messageto = messageto
+    self.nexthop = nexthop
+    self.interfaceid = interfaceid
+    self.sequencenumber = sequencenumber
+  def __str__(self) -> str:
+    return f"GenericMessageHeader: TYPE: {self.messagetype} FROM: {self.messagefrom} TO: {self.messageto} NEXTHOP: {self.nexthop} INTERFACEID: {self.interfaceid} SEQUENCE#: {self.sequencenumber}"
 
 
 class ComponentModel:
@@ -103,11 +127,12 @@ class ComponentModel:
 
     
     def send_down(self, event: Event):
+        print("send down given")
         try:
             for p in self.connectors[ConnectorTypes.DOWN]:
                 p.trigger_event(event)
         except Exception as e:
-            #raise(f"Cannot send message to Down Connector {self.componentname } -- {self.componentinstancenumber}")
+            raise(f"Cannot send message to Down Connector {self.componentname } -- {self.componentinstancenumber}")
             #logger.error(f"Cannot send message to DOWN Connector {self.componentname}-{self.componentinstancenumber} {str(event)} {e}")
             pass
         try:
@@ -213,10 +238,12 @@ class ComponentModel:
     def queue_handler(self, myqueue):
         while not self.terminated:
             workitem = myqueue.get()
+            print("queue hendleerrrrr")
             if workitem.event in self.eventhandlers:
                 self.on_pre_event(workitem)
                 #logger.debug(f"{self.componentname}-{self.componentinstancenumber} will handle {workitem.event}")
                 self.eventhandlers[workitem.event](eventobj=workitem)  # call the handler
+                print("queueuehendlerr inside")
             else:
                 logger.error(f"{self.componentname}.{self.componentinstancenumber} Event Handler: {workitem.event} is not implemented")
             myqueue.task_done()
@@ -228,6 +255,7 @@ class ComponentModel:
 
     def trigger_event(self, eventobj: Event):
         #logger.debug(f"{self.componentname}.{self.componentinstancenumber} invoked with {str(eventobj)}")
+        print("input queueueue")
         self.inputqueue.put_nowait(eventobj)
 
     def on_pre_event(self, event):
@@ -258,22 +286,34 @@ class TouegRoutingComponent(ComponentModel):
     def on_init(self, eventobj: Event):
         super(TouegRoutingComponent, self).on_init(eventobj)
         # the first process does not start immediate, it stars with a peer message
-        if self.componentinstancenumber != 0:
-            thread = Thread(target=self.job, args=[45, 54, 123])
-            thread.start()
+        
+        thread = Thread(target=self.job, args=[45, 54, 123])
+        thread.start()
 
     def on_message_from_bottom(self, eventobj: Event):
-        message_destination = eventobj.eventcontent.header.messageto.split("-")[0]
-        if message_destination == TouegRoutingComponent.__name__: # process only the messages targeted to this component...
+        print("********************")
+        message_destination = eventobj.eventcontent.header.messageto.split("-")[1]
+        print(message_destination)
+        if int(message_destination) == int(self.componentinstancenumber): # process only the messages targeted to this component...
+            print("??????????????????")
             message_source_id = eventobj.eventcontent.header.messagefrom.split("-")[1]
             message_type = eventobj.eventcontent.header.messagetype
             content = eventobj.eventcontent.payload
-
+            print("message_source_id")
+            print(message_source_id)
             if message_type == "INFO" or message_type == "DISTANCE":
                 self.queue_lock.acquire() # protect message_queue, both component thread and Toueg thread are trying to access data
                 self.message_queue.append((int(message_source_id), message_type, content))
                 self.queue_lock.release()
 
+        message_header = eventobj.eventcontent.header
+        message_target = eventobj.eventcontent.header.messageto.split("-")[1]
+        if message_target == int(0):
+            if self.componentinstancenumber == 0:
+                if message_header.messagetype == "INITIATEROUTE":
+                    print("initt ?????")
+                    thread = Thread(target=self.job, args=[45, 54, 123])
+                    thread.start()
 
     def on_message_from_peer(self, eventobj: Event):
         message_header = eventobj.eventcontent.header
@@ -289,14 +329,25 @@ class TouegRoutingComponent(ComponentModel):
         self.neighbors = self.TOPO.get_neighbors(self.componentinstancenumber) # retrieve all neighbor ids...
 
         self.neighbor_weights = {a: 1 for a in self.neighbors} # for the time being each edge weight is 1...
+        self.all_process_ids.append(0)
+        self.all_process_ids.append(1)
+        self.all_process_ids.append(2)
 
         neighbor_ids = [a for a in self.neighbors]
+        print("self.componentinstancenumber")
+        print(self.componentinstancenumber)
+        print("self.all_process_ids")
+        print(self.all_process_ids)
+        print("self.neighbor_ids")
+        print(neighbor_ids)
         # found shortest path information will be sent to Coordinator component
         message_payload = self.TOUEG(self.all_process_ids, neighbor_ids, self.neighbor_weights)
         message_header = GenericMessageHeader("ROUTINGCOMPLETED", self.componentname+"-"+str(self.componentinstancenumber),
                                               "Coordinator-"+str(self.componentinstancenumber))
         message = GenericMessage(message_header, message_payload)
         event = Event(self, EventTypes.MFRP, message)
+        print("event")
+        print(event)
         self.send_peer(event)
 
 
@@ -304,7 +355,8 @@ class TouegRoutingComponent(ComponentModel):
         self.process_id = self.componentinstancenumber
         self.Su = set([])
         self.ParentInformation = {self.process_id: {}}
-
+        print("componentinstancenumber TOUEG INSIDE")
+        print(self.componentinstancenumber)
         for v in vertices:
             if v == self.process_id:
                 self.DistanceInformation[self.process_id][v] = 0
@@ -322,6 +374,7 @@ class TouegRoutingComponent(ComponentModel):
         sorted_ids = unordered_vertices
         current_pivot_index = 0
         vertices = set(vertices)
+        print("vertices.difference(self.Su)")
         print(vertices.difference(self.Su))
         while len(vertices.difference(self.Su)) != 0 : # Su != Vertices should be...
             pivot = sorted_ids[current_pivot_index]
@@ -371,8 +424,11 @@ class TouegRoutingComponent(ComponentModel):
         message_header = GenericMessageHeader(message_type, TouegRoutingComponent.__name__+"-"+str(self.componentinstancenumber),
         TouegRoutingComponent.__name__+"-"+str(neighbor_id), interfaceid=str(self.componentinstancenumber)+"-"+str(neighbor_id))
         mess_ = GenericMessage(message_header, message)
-
+        print("event message_header")
+        print(message_header)
         event = Event(self, EventTypes.MFRT, mess_)
+        print("event sendMessageToNeighbor")
+        print(event)
         self.send_down(event)
 
     def getPendingChildMessageCount(self, pivot):
