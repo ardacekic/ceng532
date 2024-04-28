@@ -19,7 +19,7 @@ Consider a scenario where data needs to traverse through various nodes within a 
 
 In order to route data through paths with the lowest costs, algorithms such as all-pairs shortest-path algorithms come into play. On the other hand, when the objective is to route data utilizing the minimum number of nodes, a breadth-first search (BFS) algorithm becomes instrumental.
 
-Frederickson [1985] introduced a distributed BFS algorithm, which he leveraged for developing an all-pairs shortest-path algorithm. Frederickson's Distributed BFS Algorithm, also known as the Distributed Breadth-First Search Algorithm, is a parallel algorithm for traversing a graph. It was developed by Greg N. Frederickson in 1985.
+Frederickson [1985] introduced a distributed BFS algorithm, which he leveraged for developing an all-pairs shortest-path algorithm. Frederickson's Distributed BFS Algorithm, also known as the Distributed Breadth-First Search Algorithm, is a parallel algorithm for traversing a graph.
 The algorithm is designed to run on a distributed system, where each node in the graph is represented by a separate processor. The algorithm is based on the concept of breadth-first search, where the nodes are visited in a level-by-level manner.
 
 1. **The algorithm has the following properties:** 
