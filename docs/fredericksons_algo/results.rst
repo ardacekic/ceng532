@@ -44,12 +44,12 @@ Regarding the "old parent" problem, an error condition is visible in the provide
 Results
 ~~~~~~~~
 
-In AHCv2 environment we have provided 2 different topologies first one is ring, the second one is a random graph. The connections are showed in the given figure 4 and 5. The implementation's messages for 2 topologies are added to index reader may check that also.
+
+In the AHCv2 environment, we have implemented two distinct network topologies: a ring topology and a random graph topology. Illustrations of these topologies and their connections are displayed in Figures 4 and 5. Additionally, details about the implementation messages for both topologies are included in the index for easy reference.
 
 1. Ring topology result:
 
-When we look at the figure Ring Topology and Resulting BFS Tree, we can see the BFS tree and the initiator node is zero. We can see the levels of the tree. Note that the node 3, can either in the branch from 1 and 2 id nodes as in the figure but it can either be in the branch collected from 0 - 5 - 4. The algorithm determines this. The faster node, which sends the explore message, wins the children. But it can change simulation run to run.
-The resulting message from implementation is like this and annunced to the network:
+  Examining the figure titled "Ring Topology and Resulting BFS Tree," we observe the BFS tree with the initiator node labeled as zero. The levels of the tree are visible, and notably, node 3 could belong either to the branch linking nodes 1 and 2 or to the branch from nodes 0 through 5 to 4. This placement is determined by the algorithm, where the node that sends the explore message first gains the children. However, this assignment can vary with each simulation run. The implementation generates a message that is subsequently broadcast across the network as follows:
  1. BFS Completed Reverse ....
  2. Tree :  {1: {2: {3: {}}}, 5: {4: {}}}
  3. Exiting 
@@ -60,8 +60,8 @@ The resulting message from implementation is like this and annunced to the netwo
   Ring Topology and Resulting BFS Tree
 
 2. Random graph topology result:
- When we look at the figure Random Topology and Resulting BFS Tree, we can see the BFS tree and the initiator node is zero also. But in this case the BFS tree is fixed, and the algorithm will always give this result if every node in the network is alive. Algorithm is not checking the nodes aliveness:
 
+  Upon reviewing the figure titled "Random Topology and Resulting BFS Tree," we observe the BFS tree with the initiator node also set to zero. In this scenario, the structure of the BFS tree remains consistent, and the algorithm consistently produces the same result, provided all nodes in the network are functional. It should be noted that the algorithm does not verify whether the nodes are active or not:
  1. BFS Completed Reverse ....
  2.  Tree :  {1: {2: {}, 4: {5: {}}}, 3: {}}
  3.  Exiting
@@ -71,9 +71,10 @@ The resulting message from implementation is like this and annunced to the netwo
   
   Random Topology and Resulting BFS Tree
 
-We can extend the results obtained from the random graph to the mesh topology. As clearly observed from the results, the algorithm performs as anticipated. From the perspective of the zeroth node, the BFS tree is generated and communicated across the network.
 
-Upon examining the graphical representations, we see that a minimum spanning tree is also generated, allowing the zeroth node to efficiently send messages to any desired node. A critical aspect of distributed networks, known as messaging complexity, reflects the total number of messages required by the algorithm to converge to a result. We can determine that the messaging complexity is strictly limited to  O(V^2). This complexity is not influenced by changes in topology but rather by the number of nodes, provided they are not connected as peers, which would indicate an issue with the algorithm's implementation.
+The results from the random graph can be extrapolated to the mesh topology. The algorithm performs as expected, and from the zeroth node's perspective, the BFS tree is successfully generated and disseminated across the network.
+
+Graphical analyses show that a minimum spanning tree (MST) is also formed, enabling the zeroth node to send messages efficiently to any other node. A key element in distributed networks is messaging complexity, which quantifies the total number of messages the algorithm needs to stabilize and reach a conclusion. The messaging complexity is capped at O(V^2), where V represents the number of nodes. Notably, this complexity remains consistent regardless of changes in topology, unless the nodes are interconnected as peers, which would suggest potential flaws in the algorithm’s design.
 
 Discussion
 ~~~~~~~~~~
