@@ -106,7 +106,7 @@ About updated variant ::
 6. 2 child/nochild messages per edge and iteration and one table transfer per vertex at the most per iteration.
 7. O(|V|^3W)bitstotal.
 
-We will implement and collect results form simple algorithm in this document. 
+We will implement and collect results form full-variant algorithm in this document. First one easy to implement. Every node must collect the distance from every node pair O(N^3) messages and select the miniumum path if exists.
 
 Complexity 
 ~~~~~~~~~~
