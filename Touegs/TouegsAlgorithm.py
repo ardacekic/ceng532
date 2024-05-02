@@ -264,10 +264,28 @@ class ComponentModel:
         
 class TouegRoutingComponent(ComponentModel):
     """
-    Initializes a new instance of TouegRoutingComponent.
-    Distributed algorithm based on Floyd-Warshall.
+    Implements a distributed routing algorithm similar to Floyd-Warshall.
+    This class manages routing information across a network of nodes and computes shortest paths.
+    
+    Attributes:
+        TOPO (object): The network topology object holding the graph information.
+        DistanceInformation (dict): Stores the shortest path distance values.
+        ParentInformation (dict): Stores the predecessor node for path tracing.
+        all_process_ids (list): List of all node IDs in the network.
+        Su (list): List of processed nodes; the algorithm terminates when all nodes are processed.
+        neighbors (list): List of direct neighbors to this node.
+        message_queue (list): Queue to hold messages for further processing.
+        queue_lock (Lock): Lock to synchronize access to the message queue.
     """
     def __init__(self, componentname, componentid ,topology):
+        """
+        Initializes a new instance of TouegRoutingComponent.
+
+        Parameters:
+            componentname (str): Name of the component.
+            componentid (int): Unique identifier for the component.
+            topology (object): The network topology used for routing.
+        """
         super(TouegRoutingComponent, self).__init__(componentname, componentid, topology=topology, num_worker_threads=3)
         # two dictionaries are indexed with the component id, hence, while broadcasting, the other nodes can easily understant whose distance information they are currently working
         self.TOPO = topology
@@ -280,6 +298,12 @@ class TouegRoutingComponent(ComponentModel):
         self.queue_lock = Lock()
 
     def on_init(self, eventobj: Event):
+        """
+        Handles the initialization event for the component. Starts the routing algorithm in a separate thread.
+
+        Parameters:
+            eventobj (Event): The event object containing initialization details.
+        """
         super(TouegRoutingComponent, self).on_init(eventobj)
         # the first process does not start immediate, it stars with a peer message
         
@@ -287,6 +311,12 @@ class TouegRoutingComponent(ComponentModel):
         thread.start()
 
     def on_message_from_bottom(self, eventobj: Event):
+        """
+        Processes messages received from lower layers or subsystems, filtering them by target ID.
+
+        Parameters:
+            eventobj (Event): The event object containing message details.
+        """    
         message_destination = eventobj.eventcontent.header.messageto.split("-")[1]
         if int(message_destination) == int(self.componentinstancenumber): # process only the messages targeted to this component...
             message_source_id = eventobj.eventcontent.header.messagefrom.split("-")[1]
@@ -315,6 +345,12 @@ class TouegRoutingComponent(ComponentModel):
                     thread.start()
 
     def job(self, *arg):
+        """
+        The main job function for the routing component which computes the shortest paths using the TOUEG algorithm.
+
+        Parameters:
+            args (tuple): Contains parameters passed to the job, usually configuration or context.
+        """
         self.all_process_ids = []
         self.neighbors = self.TOPO.get_neighbors(self.componentinstancenumber) # retrieve all neighbor ids...
 
@@ -335,6 +371,14 @@ class TouegRoutingComponent(ComponentModel):
 
 
     def TOUEG(self, vertices, neigbors, neighbor_weights):
+        """
+        Implements the TOUEG algorithm for distributed routing, calculating shortest paths in a network.
+
+        Parameters:
+            vertices (list): List of all vertex IDs in the network.
+            neighbors (list): List of neighbor vertex IDs for the current node.
+            neighbor_weights (dict): Dictionary mapping neighbor vertex IDs to their respective edge weights.
+        """    
         self.process_id = self.componentinstancenumber
         self.Su = set([])
         self.ParentInformation = {self.process_id: {}}
