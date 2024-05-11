@@ -182,7 +182,40 @@ The indexing of each node has been adjusted to start from 0. Therefore, while th
 7. Path Finding has been completed 6 - {6: {0: 1, 1: 2, 2: 3, 3: 3, 4: 2, 5: 1, 6: 0}}
 
 
+We will now investigate the behavior of the second topology, Graph 3, whose logical representation is depicted in Figure 3. The third toplogy can be defined as Mesh toplogy which is widly used as network toplogy in real-life applications too. Table 3 presents the matrix representation of the algorithm's results, obtained using the Floyd-Warshall algorithm.
 
+In mesh toplogy network, if all weights are the same (a.k.a vertices), the all of pairs distances are the same. In order to fully understand the power of the algorithm we need to access the graphs vertex values and run with it.
+
+.. figure:: figures/graph_3.png
+  :width: 250
+  
+  Topology Graph 3
+
+
+.. list-table:: Distance Matrix of Graph 3 Each Node to Each Node
+   :widths: 20 20 20 20
+   :header-rows: 1
+   
+   * - Node 1
+     - Node 2
+     - Node 3
+     - Node 4
+   * - 0
+     - 1
+     - 1
+     - 1
+   * - 1
+     - 0
+     - 1
+     - 1
+   * - 1
+     - 1
+     - 0
+     - 1
+   * - 1
+     - 1
+     - 1
+     - 0
 
 Discussion
 ~~~~~~~~~~
