@@ -3,6 +3,18 @@
 |touegs_algo|
 =========================================
 
+Background and Related Work
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The concept of distributed computing and the challenges associated with it, especially in terms of reliability and coordination of distributed systems, are critical in understanding Toueg's algorithm. The background of this algorithm is deeply rooted in solving the all-pairs shortest paths problem in a distributed manner, akin to the centralized Floyd-Warshall algorithm which is fundamental in graph theory for computing shortest paths between all pairs of nodes in a weighted graph.
+
+Toueg's algorithm modifies the Floyd-Warshall approach to suit distributed systems by enabling each node to compute shortest paths independently using localized information and communication with other nodes. This adaptation is essential for applications where data is too large to be processed centrally or where the system is geographically dispersed.
+
+The related work primarily involves the exploration of various shortest path algorithms like Dijkstra’s and Bellman-Ford, which are traditionally designed for single-source shortest path problems. However, unlike these, Floyd-Warshall and by extension Toueg’s algorithm, focus on all-pairs shortest paths, which is more comprehensive for network analysis.
+
+Researchers have further explored these concepts by integrating theories of fault tolerance and algorithms designed to enhance the reliability of distributed operations. The advancements in multi-core and multi-threaded computing have also influenced the development of more efficient distributed algorithms by allowing parallel processing and reducing computation time significantly.
+
+In summary, the background and related work surrounding Toueg's algorithm highlight the evolution of network analysis algorithms from centralized to distributed frameworks, addressing both the computational and reliability challenges posed by modern distributed systems. This research is crucial for the ongoing development of more robust and efficient distributed computing environments.
+
 Distributed Algorithm: |touegs_algo| 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,4 +123,6 @@ We will implement and collect results form full-variant algorithm in this docume
 Complexity 
 ~~~~~~~~~~
 
-Message and time complexity of the Toueg's algortihm is : O(N²)
+Time complexity of the Toueg's algortihm is : O(N^3)
+
+The message complexity of the Toueg's algorithm is: O(|V|^3W) bits in total.

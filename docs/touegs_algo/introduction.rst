@@ -7,7 +7,6 @@ Running code on a single computing unit, typically a thread or core, often falls
 
 Yet, an even more ambitious approach involves dividing a program into components executable by entirely separate machines. This model gives rise to distributed systems, in which distinct computers communicate over a network. Such systems can be architected in various configurations, including client-server, peer-to-peer, and n-tier models.
 
-The essence of the distinction between parallel and distributed computing lies in their communication mechanisms. Parallel computing, particularly within multi-core systems, benefits from shared memory access, allowing compute units (CPU cores) to communicate swiftly via the bus. Conversely, distributed systems operate on a model of distributed memory, where each computer possesses its own memory, necessitating message passing over a network for inter-computer communication. 
 
 Knowing how to send the data from a node to another node efficiently is a big task in distributed environment. There are some algorithms, which can help to treverse the path among the conneceted nodes and determine the shortest path between them. This algorithms called single source shortest path or all pairs shortest path. In this documuntation we will focus on an all pair shortest path algorithm based on Floyd-Warshall called Toueg's Algortihm.
 
@@ -15,7 +14,7 @@ Routing algorithms are those that give us the shortest path to an specific desti
 
 Toueg's distributed algorithm for this problem is based on the centralized Floyd-Warshall algorithm for computing shortest paths between all pairs of nodes.
 
-How to Define Toueg's algorithm:
+As a Conclusion How to Define Toueg's algorithm:
 
 • Floyd-Warshall algorithm with variables split over nodes of the network.
 • Every node has information on the shortest route (found so far) to every other node.
